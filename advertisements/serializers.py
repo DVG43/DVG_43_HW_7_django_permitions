@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from api_with_restrictions.advertisements.models import Advertisement
 
@@ -36,10 +37,13 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         # само поле при этом объявляется как `read_only=True`
         validated_data["creator"] = self.context["request"].user
         return super().create(validated_data)
-
+                                                                pip
     def validate(self, data):
         """Метод для валидации. Вызывается при создании и обновлении."""
-
+        creator = self.context['request'].user
         # TODO: добавьте требуемую валидацию
+        qant_advart = Advertisement.object.filter(creator = creator, 'status'= OPEN)
+             if len(qant_advart) == 10:            
+                   raise ValidationError('Количесвто открытых элементов пользователя больше 10')
 
         return data
